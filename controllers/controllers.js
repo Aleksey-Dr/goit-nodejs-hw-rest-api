@@ -1,15 +1,13 @@
-const contacts = require("../models/contacts");
+const { Contact } = require("../models/contact");
 const { HttpError, ctrlWrapper } = require("../helpers");
 
-// const addSchema = require("../schemas");
-
 const getAllContacts = async (req, res) => {
-  res.json(await contacts.listContacts());
+  res.json(await Contact.find());
 };
 
 const getById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await contacts.getContactById(contactId);
+  const result = await Contact.findById(contactId);
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -17,13 +15,13 @@ const getById = async (req, res) => {
 };
 
 const addNewContact = async (req, res) => {
-  const result = await contacts.addContact(req.body);
+  const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
 const deleteContact = async (req, res) => {
   const { contactId } = req.params;
-  const result = await contacts.removeContact(contactId);
+  const result = await Contact.findByIdAndRemove(contactId);
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -34,12 +32,21 @@ const deleteContact = async (req, res) => {
 
 const changeContact = async (req, res) => {
   const { contactId } = req.params;
-  const result = await contacts.updateContact(contactId, req.body);
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {new: true});
   if (!result) {
     throw HttpError(404, "Not found");
   }
   res.json(result);
 };
+
+const changeFavorite = async (req, res) => {
+  const { contactId } = req.params;
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {new: true});
+  if (!result) {
+    throw HttpError(404, "Not found");
+  }
+  res.json(result);
+}
 
 module.exports = {
   getAllContacts: ctrlWrapper(getAllContacts),
@@ -47,4 +54,5 @@ module.exports = {
   addNewContact: ctrlWrapper(addNewContact),
   deleteContact: ctrlWrapper(deleteContact),
   changeContact: ctrlWrapper(changeContact),
+  changeFavorite: ctrlWrapper(changeFavorite),
 };
